@@ -1,33 +1,3 @@
--- String manipulations
-/* 1. Some product names in the product table have descriptions like "Jar" or "Organic". 
-These are separated from the product name with a hyphen. 
-Create a column using SUBSTR (and a couple of other commands) that captures these, but is otherwise NULL. 
-Remove any trailing or leading whitespaces. Don't just use a case statement for each product! 
-
-| product_name               | description |
-|----------------------------|-------------|
-| Habanero Peppers - Organic | Organic     |
-
-Hint: you might need to use INSTR(product_name,'-') to find the hyphens. INSTR will help split the column. */
-
-
-
-/* 2. Filter the query to show any product_size value that contain a number with REGEXP. */
-
-
-
--- UNION
-/* 1. Using a UNION, write a query that displays the market dates with the highest and lowest total sales.
-
-HINT: There are a possibly a few ways to do this query, but if you're struggling, try the following: 
-1) Create a CTE/Temp Table to find sales values grouped dates; 
-2) Create another CTE/Temp table with a rank windowed function on the previous query to create 
-"best day" and "worst day"; 
-3) Query the second temp table twice, once for the best day, once for the worst day, 
-with a UNION binding them. */
-
-
-
 -- Cross Join
 /*1. Suppose every vendor in the `vendor_inventory` table had 5 of each of their products to sell to **every** 
 customer on record. How much money would each vendor make per product? 
@@ -39,7 +9,15 @@ Think a bit about the row counts: how many distinct vendors, product names are t
 How many customers are there (y). 
 Before your final group by you should have the product of those two queries (x*y).  */
 
-
+SELECT
+    v.vendor_name,
+	p.product_name,
+	v1.original_price *5 * count(DISTINCT V1.vendor_id)AS total_revenue_per_product
+From vendor_inventory v1
+JOIN product p ON v1.product_id = p.product_id
+cross JOIN vendor v
+Group by 
+    v.vendor_name, p.product_name,v1.original_price
 
 -- INSERT
 /*1.  Create a new table "product_units". 
@@ -51,14 +29,23 @@ Name the timestamp column `snapshot_timestamp`. */
 
 /*2. Using `INSERT`, add a new row to the product_units table (with an updated timestamp). 
 This can be any product you desire (e.g. add another record for Apple Pie). */
+Drop TABLE IF EXISTS TEMP.product_units;
+CREATE TEMP TABLE product_units AS
+  SELECT *, CURRENT_TIMESTAMP AS snapshot_timestamp
+  From product
+  Where product_qty_type = 'unit';
 
+INSERT INTO product_units(product_id, product_name, product_size, product_category_id, product_qty_type, snapshot_timestamp)
+values('24','Apple Juice - Organic','1 bottle','9','bottle', CURRENT_TIMESTAMP);
 
 
 -- DELETE
 /* 1. Delete the older record for the whatever product you added. 
 
 HINT: If you don't specify a WHERE clause, you are going to have a bad time.*/
-
+Delete from product_units
+Where product_name = 'Apple Juice - Orangic'
+  And snapshot_timestamp <CURRENT_TIMESTAMP;
 
 
 -- UPDATE
@@ -78,4 +65,13 @@ Finally, make sure you have a WHERE statement to update the right row,
 	you'll need to use product_units.product_id to refer to the correct row within the product_units table. 
 When you have all of these components, you can run the update statement. */
 
-
+ALTER TABLE product_units
+ADD current_quantity INT;
+Update product_units
+Set current_quantity = COALESCE ((
+    SELECT v.quantity
+	From vendor_inventory v
+	Where v.product_id = product_units.product_id
+	order by v.product_id DESC
+	LIMIT 1
+),0);
