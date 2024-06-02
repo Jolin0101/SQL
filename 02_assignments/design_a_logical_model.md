@@ -5,9 +5,10 @@ Create a logical model for a small bookstore. 📚
 
 At the minimum it should have employee, order, sales, customer, and book entities (tables). Determine sensible column and table design based on what you know about these concepts. Keep it simple, but work out sensible relationships to keep tables reasonably sized. Include a date table. There are several tools online you can use, I'd recommend [_Draw.io_](https://www.drawio.com/) or [_LucidChart_](https://www.lucidchart.com/pages/).
 
+![alt text](<Assignment 1- 1.png>)
 ## Question 2
 We want to create employee shifts, splitting up the day into morning and evening. Add this to the ERD.
-
+![alt text](<Assignment 1-2.png>)
 ## Question 3
 The store wants to keep customer addresses. Propose two architectures for the CUSTOMER_ADDRESS table, one that will retain changes, and another that will overwrite. Which is type 1, which is type 2?
 
@@ -17,6 +18,10 @@ Bonus: Are there privacy implications to this, why or why not?
 ```
 Your answer...
 ```
+Type 1 is retain changes - when the new address is added, the old address will be kept;
+Type 2 is overwrite - when the new address is added, the old address will be overwritten.
+
+Yes, there're privacy implications if the old address will be kept.
 
 ## Question 4
 Review the AdventureWorks Schema [here](https://i.stack.imgur.com/LMu4W.gif)
@@ -25,7 +30,7 @@ Highlight at least two differences between it and your ERD. Would you change any
 ```
 Your answer...
 ```
-
+I would have xx_ID as the first column; and summarize the different types in different areas.
 # Criteria
 
 [Assignment Rubric](./assignment_rubric.md)
